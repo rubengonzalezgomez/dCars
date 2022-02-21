@@ -14,7 +14,7 @@ contract CarData is Ownable{
     mapping (address => uint[]) ownerToCars;    //one person can have more than one car
 
     //mapping (address => uint) offers;
-    mapping(uint => offer) offers;
+    mapping(uint => offer[]) offers;
 
     struct offer{
         address buyer;
@@ -43,77 +43,65 @@ contract CarData is Ownable{
 
     State state;
 
-    modifier notListed() 	{ require(state == State.Created); 	_;}
-    modifier onSale() 	{ require(state == State.onSale); 	_;}
+    modifier Sale() 	{ require(state == State.onSale); 	_;}
     modifier Sold() 	{ require(state == State.Sold); 	_;}
 
     event Created(uint id, string brand, string model);
-    event Sale();
+    event onSale(uint id, uint price);
     event bid();
     event sold();
 
+    //created but not onSale
     function createNewCar(string memory _VIN, string memory _brand, string memory _model, uint24 _kilometraje, string memory _ipfsMetaData) external {
-        uint id = cars.push(Car(_VIN,_brand,_model,_kilometraje,_ipfsMetaData))-1;
+        cars.push(Car(_VIN,_brand,_model,_kilometraje,_ipfsMetaData,0));
+
+        uint id = cars.length-1;
         carToOwner[id] = msg.sender;
-        ownerToCars[msg.sender] = id;
+        ownerToCars[msg.sender].push(id);
 
         emit Created(id, _brand, _model);
     }
 
+    //created and onSale
+    function createNewCar(string memory _VIN, string memory _brand, string memory _model, uint24 _kilometraje, string memory _ipfsMetaData,uint _price) external {
+        cars.push(Car(_VIN,_brand,_model,_kilometraje,_ipfsMetaData,0));
 
-    function List(uint _price) external onlyOwner{
-        price = _price;
+        uint id = cars.length-1;
+        carToOwner[id] = msg.sender;
+        ownerToCars[msg.sender].push(id);
+
+        emit Created(id, _brand, _model);
+        emit onSale(id, _price);
+    }
+    
+
+      function List(uint id, uint _price) external onlyOwner{
+        cars[id].price = _price;
         state = State.onSale;
-        emit Sale();
+        emit onSale(id,_price);
     }
 
-    function placeBid(uint _bid) external payable onSale{
-        uint minimum = price/2;
+    function placeBid(uint id,uint _bid) external payable Sale{
+        uint minimum = cars[id].price/2;
         
         require(_bid >= minimum);
 
-        uint id = offersCounter;       //id starts in 0
-        offersCounter++;
-
-        offers[id] = offer(msg.sender,_bid);
+        offers[id].push(offer(msg.sender,_bid));
 
         emit bid();
     }
-    
-   /* function sell(uint i) external onlyOwner onSale{
 
-            require(i-1<offersCounter);     //usr view : offers starts in 1
-
-            address buyer = offers[i-1].buyer;
-
-            uint id = generateCarID();
-            carToOwner[id] = buyer;
-            ownerToCars[buyer].push(id);
-
-            for(uint j = 0; j < offersCounter; j++){
-                delete offers[j];
-            }
-            offersCounter = 0;
-
-            state = State.Sold;
-            emit sold();
-        
-    } */
-
-    function getOffers() external view returns(uint){
-        return offersCounter;
-    }
-
-    function showOffer(uint i) external view returns (offer memory){
+    function showOffer(uint id,uint i) external view returns (offer memory){
         
         require(i-1<offersCounter);     //usr view : offers starts in 1
-        return offers[i-1];
+        offer[] memory aux = offers[id];
+        return aux[i];
     }
 
-    function generateCarID() private view returns (uint256) {
+    function generateCarID(string memory _VIN) private view returns (uint256) {
 		// NOTE: Hopefully, this way there will not be any cars that have the same ID.
 		// VIN will never be the same string for different cars
-		return uint256(keccak256(abi.encodePacked(VIN)));
+		return uint256(keccak256(abi.encodePacked(_VIN)));
 	}
 
 }
