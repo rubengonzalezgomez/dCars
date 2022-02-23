@@ -27,12 +27,6 @@ contract CarOwnership is CarData, IERC721{
     mapping (uint256 => address) tokenApprovals;
     mapping (address => mapping (address => bool)) internal operatorApprovals;
 
-    constructor (string memory _VIN, string memory _brand, string memory _model, uint24 _kilometraje, string memory _ipfsMetaData) 
-        CarData(_VIN,_brand,_model,_kilometraje,_ipfsMetaData){
-        supportedInterfaces[0x80ac58cd] = true;
-    }
-
-
     function supportsInterface(bytes4 interfaceID) override external view returns (bool){
 		return supportedInterfaces[interfaceID];
 	}   
@@ -79,6 +73,8 @@ contract CarOwnership is CarData, IERC721{
       }
       carToOwner[tokenId] = to;
 		  ownerToCars[to].push(tokenId);
+
+      delete offers[tokenId];
 
 	    tokenApprovals[tokenId] = address(0);
     }
