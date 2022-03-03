@@ -77,7 +77,7 @@ contract CarData is Ownable{
     
 
       function List(uint id, uint _price) external NotListed(id){
-        require(msg.sender == carToOwner[id], "You are not the owner of this car");  //only the car owner can list his car
+        require(msg.sender == carToOwner[id]);  //only the car owner can list his car
         cars[id].price = _price;
         cars[id].state = State.onSale;
         emit onSale(id,_price);
@@ -141,7 +141,7 @@ contract CarData is Ownable{
 	}
 
     //this function will be executed by the car automatically every month
-    function updateKilometraje(uint id, uint24 km) external onlyOwner{ 
+    function updateKilometraje(uint id, uint24 km) private{ 
         require(km > cars[id].kilometraje);
         cars[id].kilometraje = km;
     } 
