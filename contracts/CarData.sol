@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 
+
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 
@@ -64,7 +65,7 @@ contract CarData is Ownable{
 
     //created and onSale
     //only the owner of the contract is allowed to register new cars in the platform
-    function createNewCar(string memory _VIN, string memory _brand, string memory _model, uint24 _kilometraje, string memory _ipfsMetaData,uint _price) external onlyOwner{
+    function createListNewCar(string memory _VIN, string memory _brand, string memory _model, uint24 _kilometraje, string memory _ipfsMetaData,uint _price) external onlyOwner{
         cars.push(Car(_VIN,_brand,_model,_kilometraje,_ipfsMetaData,_price,State.onSale));
 
         uint id = cars.length-1;
@@ -134,16 +135,57 @@ contract CarData is Ownable{
         return offers[id];
     }
 
-    function generateCarID(string memory _VIN) private view returns (uint256) {
-		// NOTE: Hopefully, this way there will not be any cars that have the same ID.
-		// VIN will never be the same string for different cars
-		return uint256(keccak256(abi.encodePacked(_VIN)));
-	}
-
     //this function will be executed by the car automatically every month
     function updateKilometraje(uint id, uint24 km) private{ 
         require(km > cars[id].kilometraje);
         cars[id].kilometraje = km;
-    } 
+    }
+
+    function getNumCars() public view returns(uint){
+        return cars.length;
+    }
+
+
+    function getBrand(uint id) public view returns (string memory) {
+        return(cars[id].brand);
+    }
+
+    function getModel(uint id) public view returns (string memory) {
+        return(cars[id].model);
+    }
+
+    function getPrice(uint id) public view returns (uint) {
+        return(cars[id].price);
+    }  
+
+    function getBrandsCar() public view returns (string[] memory) {
+        string[] memory brandaux = new string[](cars.length);
+
+        for(uint i = 0; i<cars.length; i++){
+            brandaux[i] = cars[i].brand;
+        }
+        return(brandaux);
+    }
+
+    function getModelsCar() public view returns (string[] memory) {
+        string[] memory modelaux = new string[](cars.length);
+
+        for(uint i = 0; i<cars.length; i++){
+            modelaux[i] = cars[i].model;
+        }
+        return(modelaux);
+
+    }
+
+    function getPricesCar() public view returns (uint[] memory) {
+        uint[] memory priceaux = new uint[](cars.length);
+
+        
+        for(uint i = 0; i<cars.length; i++){
+            priceaux[i] = cars[i].price;
+        }
+        return(priceaux);
+
+    }
 
 }
