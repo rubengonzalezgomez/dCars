@@ -41,20 +41,14 @@ App = {
   },
 
   bindEvents: function() {
-    $(document).on('click', '.btn-newcar', App.handleAdopt);
+    $(document).on('click', '.btn-newcar', App.handleNewCar);
     return App.showCars();
   },
 
   showCars: async function(){
-    var carsRow = $('#carsRow');
-    var carTemplate = $('#carTemplate');
 
     // Load cars.
-    let newCar = await App.contracts.CarOwnership.deployed();
-    var carInstance = await newCar.createListNewCar("83274FHU","AUDI","A7",0, "METADATA", 20000,{'from':web3.eth.accounts[0]});
-
-    let instance2 = await App.contracts.CarOwnership.deployed();
-    carInstance = instance2;
+    let carInstance = await App.contracts.CarOwnership.deployed();
 
     const numCars = await carInstance.getNumCars();
 
@@ -80,6 +74,9 @@ App = {
     console.log(prices);
 
     //Print cars on sale
+    var carsRow = $('#carsRow');
+    var carTemplate = $('#carTemplate');
+
     for(i = 0;i < models.length; i++){
        carTemplate.find('.panel-title').text(brands[i] + ' ' + models[i]);
        //carTemplate.find('img').attr('src', cars[i].ipfsMetaData);
@@ -93,53 +90,18 @@ App = {
     
   },
 
-  
- /* markAdopted: function() {
-    var adoptionInstance;
+  handleNewCar: async function() {
+    var vin = document.getElementById("VIN").value;
+    var brand = document.getElementById("brand").value;
+    var model = document.getElementById("model").value;
+    var kms = document.getElementById("kms").value;
+    var metadata = document.getElementById("metadata").value;
+    var price = document.getElementById("price").value;
 
-    App.contracts.Adoption.deployed().then(function(instance) {
-      adoptionInstance = instance;
 
-      return adoptionInstance.getAdopters.call();
-    }).then(function(adopters) {
-      for (i = 0; i < adopters.length; i++) {
-        if (adopters[i] !== '0x0000000000000000000000000000000000000000') {
-          $('.panel-pet').eq(i).find('button').text('Success').attr('disabled', true);
-        }
-      }
-    }).catch(function(err) {
-      console.log(err.message);
-    });
-  }, 
-
-  handleAdopt: function(event) {
-    event.preventDefault();
-
-    var petId = parseInt($(event.target).data('id'));
-
-    var adoptionInstance;
-
-web3.eth.getAccounts(function(error, accounts) {
-  if (error) {
-    console.log(error);
-  }
-
-  var account = accounts[0];
-
-  App.contracts.Adoption.deployed().then(function(instance) {
-    adoptionInstance = instance;
-
-    // Execute adopt as a transaction by sending account
-    return adoptionInstance.adopt(petId, {from: account});
-  }).then(function(result) {
-    return App.markAdopted();
-  }).catch(function(err) {
-    console.log(err.message);
-    });
-  });
-  }
-
-  */
+    let carInstance = await App.contracts.CarOwnership.deployed();
+    carInstance.createListNewCar(vin,brand,model,kms, metadata, price,{"from" : web3.eth.accounts[0]});
+    }
 
 
 };

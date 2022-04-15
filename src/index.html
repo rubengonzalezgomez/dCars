@@ -28,37 +28,60 @@
       </div>
 
       <br></br>
-      <h1 id="title">Add a car</h1>
+      <h1 id="title">Add new car</h1>
       <p>
-        Simply add your car info and press "Add."
+        Simply add your car info and press "Put up for sale"
       </p>
       <form>
-        <h2>Model</h2>
+        <h2>VIN</h2>
         <input
+          id = "VIN"
           type="text"
-          placeholder="e.g. A7"
+          placeholder = "e.g. 83274FHU"
+          required="required"
         />
         <h2>Brand</h2>
         <input
+          id = "brand"
           type="text"
           placeholder="e.g. AUDI"
+          required="required"
+        />
+        <h2>Model</h2>
+        <input
+          id = "model"
+          type="text"
+          placeholder="e.g. A7"
+          required="required"
+        />
+        <h2>Kms</h2>
+        <input
+          id = "kms"
+          type="number"
+          placeholder="e.g. 120000"
+          required="required"
+        />
+        <h2>Metadata</h2>
+        <input
+          id = "metadata"
+          type="text"
+          placeholder="Car´s metadata"
+          required="required"
         />
         <h2>Price</h2>
         <input
-          type="text"
+        id = "price"
+          type="number"
           placeholder="e.g. 20000"
+          required="required"
         />
-      </form>
 
-      <br></br>
+        <br></br>
 
-      <div class="panel-body">
-        <form method="get" action = "https://cryptozombies.io/es/" >
-         <button class="btn btn-default btn-newcar" type="submit" data-id="0">
-           Add a new car
+        <button class="btn btn-default btn-newcar" type="submit" data-id="0">
+          Put up for sale
          </button>
-        </form>    
-       </div>
+      </form>
        
        <br></br>
 
