@@ -4,7 +4,9 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.5.0",
-    "web3": "^1.7.1"
+    "dotenv": "^16.0.0",
+    "web3": "^1.7.3",
+    "web3-utils": "^1.7.3"
   },
   "name": "dcars",
   "description": "",

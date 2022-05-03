@@ -112,7 +112,6 @@ contract CarData is Ownable{
         }
 
         if(!found)  offers[id].push(offer(msg.sender,_bid));
-
          emit Bid(id,_bid);
     }
 
@@ -145,6 +144,10 @@ contract CarData is Ownable{
     function updateKilometraje(uint id, uint24 km) private{ 
         require(km > cars[id].kilometraje);
         cars[id].kilometraje = km;
+    }
+
+    function transferEther(uint _amount, address _to) public payable {
+       payable(address(_to)).transfer(_amount);
     }
 
     function getOwner(uint id) public view returns (address) {

@@ -1,3 +1,5 @@
+const pinata = require('C:/Users/ruben/Documents/dCars/src/js/pinata.js');
+
 App = {
   web3Provider: null,
   contracts: {},
@@ -88,9 +90,9 @@ App = {
       newCar.find('#bid-amount')
         .prop('min', prices[i] / 2)
         .prop('placeholder', "Min price: " + prices[i] / 2);
-      newCar.find('#bid-button').on('click', () => {
-          var bid = document.getElementById("bid-amount").value;
-          carInstance.placeBid(id,bid,{"from" : web3.eth.accounts[0]})
+      newCar.find('#bid-button').on('click', async () => {
+          var bid = document.getElementsByClassName("amount")[id].value;
+          carInstance.placeBid(id,bid,{"from" : web3.eth.accounts[0]});
       });
 
       App.showOffers(id);
@@ -110,14 +112,11 @@ App = {
     for(i = 0;i < numOffers; i++){
       buyers.push(await carInstance.getBuyer(id,i));
     }
-
     //Load bids
     let bids = [];
     for(i = 0;i < numOffers; i++){
       bids.push(await carInstance.getBid(id,i));
     }
-    console.log(buyers);
-    console.log(bids);
     //Print offers
     var offersRow = $('#offersRow');
     var offerTemplate = $('#offerTemplate');
@@ -125,11 +124,26 @@ App = {
     for(i = 0;i < numOffers; i++){
 
       const newOffer = offerTemplate.clone();
+      const buyerid = i;
       newOffer.css({display: "inline"});
       newOffer.find('.panel-title').text('Offer ' + i);
       newOffer.find('.offer-buyer').text(buyers[i]);
       newOffer.find('.offer-bid').text(bids[i]);
-      
+      newOffer.find('#sell-button').on('click', () => {
+        carInstance.transferFrom(web3.eth.accounts[0],buyers[buyerid],id,{"from" : web3.eth.accounts[0]});
+        const value = (1000000000000000000 * bids[buyerid]).toString();
+        web3.eth.sendSignedTransaction(
+          {from: '0xbb3Af8380b5b49D85D0fb2D57d98f415677592C0',
+          //buyers[buyerid],
+          to:'0x3d8BAfBd10726839155F092Da94855F82C67d861',
+          //web3.eth.accounts[0],
+          value:  value
+              }, function(err, transactionHash) {
+        if (!err)
+          console.log(transactionHash + " success"); 
+      });
+    });
+
       offersRow.append(newOffer);
      }
   },
@@ -140,14 +154,37 @@ App = {
     var brand = document.getElementById("brand").value;
     var model = document.getElementById("model").value;
     var kms = document.getElementById("kms").value;
-    var metadata = document.getElementById("metadata").value;
+    var image = document.getElementById("image").value;
     var price = document.getElementById("price").value;
 
 
     let carInstance = await App.contracts.CarOwnership.deployed();
-    carInstance.createListNewCar(vin,brand,model,kms, metadata, price,{"from" : web3.eth.accounts[0]});
-    }
+    createMetada(vin,brand,model,kms,image);
+    carInstance.createListNewCar(vin,brand,model,kms, image, price,{"from" : web3.eth.accounts[0]});
+    },
 
+  createMetadata: async function(vin,brand, model, kms, image){
+
+    const metadata = new Object();
+    metadata.vin = vin;
+    metadata.brand = brand;
+    metadata.model = model;
+    metadata.kms = kms
+    metadata.image = image;
+
+    const pinataResponse = await pinata.pinJSONToIPFS(metadata);
+    if (!pinataResponse.success) {
+      return {
+          success: false,
+          status: "😢 Something went wrong while uploading your tokenURI.",
+      }
+  } 
+  const tokenURI = pinataResponse.pinataUrl;
+  console.log(tokenURI);
+  return tokenURI;  
+  }
+
+  
 
 };
 
