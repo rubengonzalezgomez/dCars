@@ -1,5 +1,3 @@
-const pinata = require('C:/Users/ruben/Documents/dCars/src/js/pinata.js');
-
 App = {
   web3Provider: null,
   contracts: {},
