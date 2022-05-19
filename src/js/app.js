@@ -242,15 +242,15 @@ App = {
     var image = document.getElementById("image").value;
     var price = document.getElementById("price").value;
 
-
     let carInstance = await App.contracts.CarOwnership.deployed();
-    //createMetada(vin,brand,model,kms,image);
     carInstance.createListNewCar(vin,brand,model,kms, image, price,{"from" : web3.eth.accounts[0]});
+    App.createMetada(vin,brand,model,kms,image);
     },
 
 
-    /*createMetadata: async function(vin,brand, model, kms, image){
+    createMetadata: async function(vin,brand, model, kms, image){
 
+      console.log("IN");
       const metadata = new Object();
       metadata.vin = vin;
       metadata.brand = brand;
@@ -268,7 +268,7 @@ App = {
     const tokenURI = pinataResponse.pinataUrl;
     console.log(tokenURI);
     return tokenURI;  
-    }*/
+    }
 
 };
 
