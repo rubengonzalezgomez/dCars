@@ -74,6 +74,7 @@ contract CarOwnership is CarData, IERC721{
       carToOwner[tokenId] = to;
 		  ownerToCars[to].push(tokenId);
       cars[tokenId].state = State.NotListed;
+      cars[tokenId].price = 0;
 
       //transferEther(msg.value,to);
 

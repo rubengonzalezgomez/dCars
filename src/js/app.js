@@ -1,6 +1,10 @@
+//import {pinJSONToIPFS} from './pinata.js';
+//const pinata = require('./pinata');
+
 App = {
   web3Provider: null,
   contracts: {},
+  pinata: null,
 
   init: async function() {
     return await App.initWeb3();
@@ -69,34 +73,116 @@ App = {
       prices.push(await carInstance.getPrice(i));
     }
 
-    //Print cars on sale
-    var carsRow = $('#carsRow');
+    //Print my cars
+    var MyCarsRow = $('#MyCarsRow');
     var carTemplate = $('#carTemplate');
 
-    for(i = 0;i < numCars; i++){
+    for(let i=0;i<numCars;i++) {
+      const owner = await carInstance.getOwner(i);
+      if(owner == web3.eth.accounts[0]){
+
       const newCar = carTemplate.clone();
       newCar.css({display: "inline"});
       newCar.find('.panel-title').text(brands[i] + ' ' + models[i]);
-      newCar.find('img').attr('src', `https://picsum.photos/seed/${models[i]}/140/140`); //cars[i].ipfsMetaData);
+      newCar.find('img').attr('src', `https://gateway.pinata.cloud/ipfs/`+'QmZqffgHmmvoznQ32MMfymD1ivNNcazKxNjrMLZ35KuC5e'); //cars[i].image);
       const id = i;
-      const owner = await carInstance.getOwner(i);
+      
       newCar.find('.car-owner').text(owner);
       newCar.find('.car-brand').text(brands[i]);
       newCar.find('.car-model').text(models[i]);
-      newCar.find('.car-price').text(prices[i]);
+
+      const price = prices[i];
+      if(price == 0 ){ newCar.find('.car-price').text('Not On Sale');}
+      else{newCar.find('.car-price').text(price);}
+
+      newCar.find('.btn-bid').attr('style', "Display: none");
+      newCar.find('#bid-amount').attr('style', "Display: none");
+
+      if(price == 0 ){
+        newCar.find('.btn-mod').attr('style', "Display: none");
+        newCar.find('#modify-amount').attr('style', "Display: none");
+        newCar.find('#list-button').on('click', async () => {
+          var list = document.getElementsByClassName("price")[id].value;
+          carInstance.List(id,list,{"from" : web3.eth.accounts[0]});
+      });
+      }
+      
+      else{
+      newCar.find('.btn-list').attr('style', "Display: none");
+      newCar.find('#car-amount').attr('style', "Display: none");
       newCar.find('.btn-bid').attr('data-id', i);
       newCar.find('#bid-amount')
         .prop('min', prices[i] / 2)
         .prop('placeholder', "Min price: " + prices[i] / 2);
+        newCar.find('#modify-button').on('click', async () => {
+          var price = document.getElementsByClassName("modify")[id].value;
+          carInstance.modifyPrice(id,price,{"from" : web3.eth.accounts[0]});
+      });
       newCar.find('#bid-button').on('click', async () => {
           var bid = document.getElementsByClassName("amount")[id].value;
           carInstance.placeBid(id,bid,{"from" : web3.eth.accounts[0]});
       });
+    }
+
+      MyCarsRow.append(newCar);
 
       App.showOffers(id);
+      }
+
+     }
+
+
+    //Print cars on sale
+    var carsRow = $('#carsRow');
+    var carTemplate = $('#carTemplate');
+
+    for(let i=0;i<numCars;i++) {
+      const owner = await carInstance.getOwner(i);
+      if(owner != web3.eth.accounts[0]){
+
+      const newCar = carTemplate.clone();
+      newCar.css({display: "inline"});
+      newCar.find('.panel-title').text(brands[i] + ' ' + models[i]);
+      newCar.find('img').attr('src', `https://gateway.pinata.cloud/ipfs/`+'QmZqffgHmmvoznQ32MMfymD1ivNNcazKxNjrMLZ35KuC5e'); //cars[i].image);
+      const id = i;
+  
+      newCar.find('.car-owner').text(owner);
+      newCar.find('.car-brand').text(brands[i]);
+      newCar.find('.car-model').text(models[i]);
+
+      const price = prices[i];
+      if(price == 0 ){ newCar.find('.car-price').text('Not On Sale');}
+      else{newCar.find('.car-price').text(price);}
+      
+      newCar.find('.btn-mod').attr('style', "Display: none");
+      newCar.find('#modify-amount').attr('style', "Display: none");
+      newCar.find('.btn-list').attr('style', "Display: none");
+      newCar.find('#car-amount').attr('style', "Display: none");
+
+      if(price == 0 ){
+        newCar.find('.btn-bid').attr('style', "Display: none");
+        newCar.find('#bid-amount').attr('style', "Display: none");
+      }
+      
+      else{
+      newCar.find('.btn-bid').attr('data-id', i);
+      newCar.find('#bid-amount')
+        .prop('min', prices[i] / 2)
+        .prop('placeholder', "Min price: " + prices[i] / 2);
+        newCar.find('#modify-button').on('click', async () => {
+          var price = document.getElementsByClassName("modify")[id].value;
+          carInstance.modifyPrice(id,price,{"from" : web3.eth.accounts[0]});
+      });
+      newCar.find('#bid-button').on('click', async () => {
+          var bid = document.getElementsByClassName("amount")[id].value;
+          carInstance.placeBid(id,bid,{"from" : web3.eth.accounts[0]});
+      });
+    }
 
       carsRow.append(newCar);
+
      }
+    }
     
   },
 
@@ -119,23 +205,24 @@ App = {
     var offersRow = $('#offersRow');
     var offerTemplate = $('#offerTemplate');
 
-    for(i = 0;i < numOffers; i++){
+    for(let j = 0;j < numOffers; j++){
 
       const newOffer = offerTemplate.clone();
-      const buyerid = i;
+      const buyerid = j;
+      const b = buyers[buyerid].toString(); 
+
       newOffer.css({display: "inline"});
-      newOffer.find('.panel-title').text('Offer ' + i);
-      newOffer.find('.offer-buyer').text(buyers[i]);
-      newOffer.find('.offer-bid').text(bids[i]);
+      newOffer.find('.panel-title').text('Offer ' + j);
+      newOffer.find('.offer-buyer').text(buyers[j]);
+      newOffer.find('.offer-bid').text(bids[j]);
       newOffer.find('#sell-button').on('click', () => {
         carInstance.transferFrom(web3.eth.accounts[0],buyers[buyerid],id,{"from" : web3.eth.accounts[0]});
-        const value = (1000000000000000000 * bids[buyerid]).toString();
-        web3.eth.sendSignedTransaction(
-          {from: '0xbb3Af8380b5b49D85D0fb2D57d98f415677592C0',
-          //buyers[buyerid],
-          to:'0x3d8BAfBd10726839155F092Da94855F82C67d861',
-          //web3.eth.accounts[0],
-          value:  value
+        const value = (1000000000000000000 * bids[buyerid]).toString();   
+        web3.eth.sendTransaction(
+          {from:"0x9aFcD9326310d5D161d6B77dE7ff3196b18B49ba",
+            //buyers[buyerid],
+          to:web3.eth.accounts[0],
+          value:  value, 
               }, function(err, transactionHash) {
         if (!err)
           console.log(transactionHash + " success"); 
@@ -157,32 +244,31 @@ App = {
 
 
     let carInstance = await App.contracts.CarOwnership.deployed();
-    createMetada(vin,brand,model,kms,image);
+    //createMetada(vin,brand,model,kms,image);
     carInstance.createListNewCar(vin,brand,model,kms, image, price,{"from" : web3.eth.accounts[0]});
     },
 
-  createMetadata: async function(vin,brand, model, kms, image){
 
-    const metadata = new Object();
-    metadata.vin = vin;
-    metadata.brand = brand;
-    metadata.model = model;
-    metadata.kms = kms
-    metadata.image = image;
+    /*createMetadata: async function(vin,brand, model, kms, image){
 
-    const pinataResponse = await pinata.pinJSONToIPFS(metadata);
-    if (!pinataResponse.success) {
-      return {
-          success: false,
-          status: "😢 Something went wrong while uploading your tokenURI.",
-      }
-  } 
-  const tokenURI = pinataResponse.pinataUrl;
-  console.log(tokenURI);
-  return tokenURI;  
-  }
-
+      const metadata = new Object();
+      metadata.vin = vin;
+      metadata.brand = brand;
+      metadata.model = model;
+      metadata.kms = kms
+      metadata.image = image;
   
+      const pinataResponse = await ('pinata.json').pinJSONToIPFS(metadata);
+      if (!pinataResponse.success) {
+        return {
+            success: false,
+            status: "😢 Something went wrong while uploading your tokenURI.",
+        }
+    } 
+    const tokenURI = pinataResponse.pinataUrl;
+    console.log(tokenURI);
+    return tokenURI;  
+    }*/
 
 };
 

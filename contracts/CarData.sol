@@ -75,7 +75,7 @@ contract CarData is Ownable{
     }
     
 
-      function List(uint id, uint _price) external NotListed(id){
+      function List(uint id, uint _price) external {
         require(msg.sender == carToOwner[id]);  //only the car owner can list his car
         cars[id].price = _price;
         cars[id].state = State.onSale;
