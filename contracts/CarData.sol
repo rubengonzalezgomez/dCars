@@ -145,9 +145,19 @@ contract CarData is Ownable{
         require(km > cars[id].kilometraje);
         cars[id].kilometraje = km;
     }
+    
+    function transferEther(uint256 _amount, address payable _to) public payable {
+       _to.transfer(_amount);
+    }
 
-    function transferEther(uint _amount, address _to) public payable {
-       payable(address(_to)).transfer(_amount);
+    function returnEther(uint id) internal {
+      for(uint i = 0; i<offers[id].length; i++){
+          if(offers[id][i].buyer != carToOwner[id]){
+              uint256 amount = offers[id][i].bid * 1000000000000000000;
+              address payable to = payable(offers[id][i].buyer);
+              transferEther(amount,to);
+          }
+      }
     }
 
     function getOwner(uint id) public view returns (address) {
@@ -169,6 +179,9 @@ contract CarData is Ownable{
 
     function getPrice(uint id) public view returns (uint) {
         return(cars[id].price);
-    }  
+    } 
+
+    receive() external payable{}
+    fallback() external payable{} 
 
 }

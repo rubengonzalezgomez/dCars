@@ -4,6 +4,7 @@
 App = {
   web3Provider: null,
   contracts: {},
+  contractAddress : null,
   pinata: null,
 
   init: async function() {
@@ -38,20 +39,39 @@ App = {
   initContract: async function() {
     let CarArtifact = await (await fetch('CarOwnership.json')).json();
     App.contracts.CarOwnership = TruffleContract(CarArtifact);
+    contractAddress = CarArtifact.networks[5777].address;
     // Set the provider for our contract
     App.contracts.CarOwnership.setProvider(App.web3Provider);
 
-    return App.bindEvents();
-  },
-
-  bindEvents: function() {
-    //$(document).on('click', '.btn-newcar', App.handleNewCar);
     return App.showCars();
   },
 
   showCars: async function(){
-    // Load cars.
+    // Load cars. 
     let carInstance = await App.contracts.CarOwnership.deployed();
+
+    console.log(await carInstance.getBalance());
+
+    web3.eth.getBalance(contractAddress,function(error,result){
+
+      if(error){
+         console.log(error)
+      }
+      else{
+         console.log(result)
+      }
+   });
+    
+    web3.eth.getBalance(web3.eth.accounts[0],function(error,result){
+
+      if(error){
+         console.log(error)
+      }
+      else{
+         console.log(result)
+      }
+   });
+
 
     const numCars = await carInstance.getNumCars();
 
@@ -78,16 +98,16 @@ App = {
     var carTemplate = $('#carTemplate');
 
     for(let i=0;i<numCars;i++) {
-      const owner = await carInstance.getOwner(i);
+      let owner = await carInstance.getOwner(i);
       if(owner == web3.eth.accounts[0]){
-
+      
       const newCar = carTemplate.clone();
       newCar.css({display: "inline"});
       newCar.find('.panel-title').text(brands[i] + ' ' + models[i]);
       newCar.find('img').attr('src', `https://gateway.pinata.cloud/ipfs/`+'QmZqffgHmmvoznQ32MMfymD1ivNNcazKxNjrMLZ35KuC5e'); //cars[i].image);
       const id = i;
       
-      newCar.find('.car-owner').text(owner);
+      newCar.find('.car-owner').text(owner.substr(0,5) + "..." + owner.substr(-5,5));
       newCar.find('.car-brand').text(brands[i]);
       newCar.find('.car-model').text(models[i]);
 
@@ -146,7 +166,7 @@ App = {
       newCar.find('img').attr('src', `https://gateway.pinata.cloud/ipfs/`+'QmZqffgHmmvoznQ32MMfymD1ivNNcazKxNjrMLZ35KuC5e'); //cars[i].image);
       const id = i;
   
-      newCar.find('.car-owner').text(owner);
+      newCar.find('.car-owner').text(owner.substr(0,5) + "..." + owner.substr(-5,5));
       newCar.find('.car-brand').text(brands[i]);
       newCar.find('.car-model').text(models[i]);
 
@@ -175,7 +195,18 @@ App = {
       });
       newCar.find('#bid-button').on('click', async () => {
           var bid = document.getElementsByClassName("amount")[id].value;
-          carInstance.placeBid(id,bid,{"from" : web3.eth.accounts[0]});
+          //carInstance.placeBid(id,bid,{"from" : web3.eth.accounts[0]});
+          const value = web3.toWei(bid).toString(); 
+          web3.eth.sendTransaction( 
+            {from:web3.eth.accounts[0],
+            to:contractAddress,
+            value: value, 
+                }, function(err, transactionHash) {
+          if (!err){
+            console.log(transactionHash + " success"); 
+            carInstance.placeBid(id,bid,{"from" : web3.eth.accounts[0]});
+          }
+        });
       });
     }
 
@@ -209,29 +240,21 @@ App = {
 
       const newOffer = offerTemplate.clone();
       const buyerid = j;
-      const b = buyers[buyerid].toString(); 
 
       newOffer.css({display: "inline"});
       newOffer.find('.panel-title').text('Offer ' + j);
-      newOffer.find('.offer-buyer').text(buyers[j]);
+      newOffer.find('.offer-buyer').text(buyers[j].substr(0,5) + "..." + buyers[j].substr(-5,5));
       newOffer.find('.offer-bid').text(bids[j]);
       newOffer.find('#sell-button').on('click', () => {
         carInstance.transferFrom(web3.eth.accounts[0],buyers[buyerid],id,{"from" : web3.eth.accounts[0]});
-        const value = (1000000000000000000 * bids[buyerid]).toString();   
-        web3.eth.sendTransaction(
-          {from:"0x9aFcD9326310d5D161d6B77dE7ff3196b18B49ba",
-            //buyers[buyerid],
-          to:web3.eth.accounts[0],
-          value:  value, 
-              }, function(err, transactionHash) {
-        if (!err)
-          console.log(transactionHash + " success"); 
-      });
-    });
+        const value = web3.toWei(bids[j]);
+        carInstance.transferEther(value, web3.eth.accounts[0],{"from" : web3.eth.accounts[0]}) ;
+    }); 
 
       offersRow.append(newOffer);
      }
   },
+
 
 
   handleNewCar: async function() {
