@@ -50,8 +50,6 @@ App = {
     // Load cars. 
     let carInstance = await App.contracts.CarOwnership.deployed();
 
-    console.log(await carInstance.getBalance());
-
     web3.eth.getBalance(contractAddress,function(error,result){
 
       if(error){
@@ -146,15 +144,16 @@ App = {
 
       MyCarsRow.append(newCar);
 
-      App.showOffers(id);
-      }
+      await App.showOffers(id);
 
-     }
+    }
+
+    }
 
 
     //Print cars on sale
     var carsRow = $('#carsRow');
-    var carTemplate = $('#carTemplate');
+    var carTemplate = $('#carOnSaleTemplate');
 
     for(let i=0;i<numCars;i++) {
       const owner = await carInstance.getOwner(i);
@@ -233,7 +232,7 @@ App = {
       bids.push(await carInstance.getBid(id,i));
     }
     //Print offers
-    var offersRow = $('#offersRow');
+    var offersRow = $('#MyCarsRow');
     var offerTemplate = $('#offerTemplate');
 
     for(let j = 0;j < numOffers; j++){
@@ -242,13 +241,13 @@ App = {
       const buyerid = j;
 
       newOffer.css({display: "inline"});
-      newOffer.find('.panel-title').text('Offer ' + j);
+      newOffer.find('.panel-title').text('Offer ' + (j+1));
       newOffer.find('.offer-buyer').text(buyers[j].substr(0,5) + "..." + buyers[j].substr(-5,5));
       newOffer.find('.offer-bid').text(bids[j]);
       newOffer.find('#sell-button').on('click', () => {
         carInstance.transferFrom(web3.eth.accounts[0],buyers[buyerid],id,{"from" : web3.eth.accounts[0]});
-        const value = web3.toWei(bids[j]);
-        carInstance.transferEther(value, web3.eth.accounts[0],{"from" : web3.eth.accounts[0]}) ;
+        const value = web3.toWei(bids[j]).toString();
+        carInstance.transferEther(value, web3.eth.accounts[0],{"from" : web3.eth.accounts[0]});
     }); 
 
       offersRow.append(newOffer);
@@ -267,11 +266,10 @@ App = {
 
     let carInstance = await App.contracts.CarOwnership.deployed();
     carInstance.createListNewCar(vin,brand,model,kms, image, price,{"from" : web3.eth.accounts[0]});
-    App.createMetada(vin,brand,model,kms,image);
     },
 
 
-    createMetadata: async function(vin,brand, model, kms, image){
+  /*createMetadata: async function(vin,brand, model, kms, image){
 
       console.log("IN");
       const metadata = new Object();
@@ -291,7 +289,7 @@ App = {
     const tokenURI = pinataResponse.pinataUrl;
     console.log(tokenURI);
     return tokenURI;  
-    }
+    }*/
 
 };
 

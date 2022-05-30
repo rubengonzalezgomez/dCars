@@ -94,13 +94,9 @@
        
        <br></br>
 
-       <div id="MyCarsRow" class="row">
+      <div id="MyCarsRow" class="row">
         <!-- MyCARS LOAD HERE -->
         <h2>My Cars</h2>
-      </div>
-
-      <div id="offersRow" class="row">
-        <!-- OFFERS LOAD HERE -->
       </div>
 
       <div id="carsRow" class="row">
@@ -112,7 +108,34 @@
     </div>
 
     <div id="carTemplate" style="display: none;">
-      <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="col-sm-3 col-md-3 col-lg-7">
+        <div class="panel panel-default panel-car">
+          <div class="panel-heading">
+            <h3 class="panel-title">Brand-Model</h3>
+          </div>
+          <div class="panel-body">
+            <img alt="140x140" data-src="holder.js/140x140" class="img-rounded img-center" style="width: 100%;" src="https://picsum.photos/140/140" data-holder-rendered="true">
+            <br/><br/>
+            <strong>Owner</strong>: <span class="car-owner">0xJNDSGANK5672</span><br/>
+            <strong>Brand</strong>: <span class="car-brand">AUDI</span><br/>
+            <strong>Model</strong>: <span class="car-model">A8</span><br/>
+            <strong>Price</strong>: <span class="car-price">11</span>
+            <input style="width: 40px"  id = "modify-amount" type="number" class= "modify" required="required"/>
+            <button id="modify-button" class="btn btn-default btn-mod" type="button" data-id="0">Modify price</button>  <br/><br/>
+
+            <input id = "bid-amount" type="number" class= "amount" required="required"/>
+            <button id="bid-button" class="btn btn-default btn-bid" type="button" data-id="0">Place a bid</button>  
+
+            <input id = "car-amount" type="number" class= "price" required="required"/>
+            <button id="list-button" class="btn btn-default btn-list" type="button" data-id="0">Put Up For Sale</button> 
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="carOnSaleTemplate" style="display: none;">
+      <div class="col-sm-3 col-md-3 col-lg-4">
         <div class="panel panel-default panel-car">
           <div class="panel-heading">
             <h3 class="panel-title">Brand-Model</h3>
@@ -140,16 +163,16 @@
 
 
     <div id="offerTemplate" style="display: none;">
-      <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="col-sm-6 col-md-3 col-lg-2">
         <div class="panel panel-default panel-offer">
           <div class="panel-heading">
             <h3 class="panel-title">Offer</h3>
           </div>
-          <div class="panel-body">
-            <strong>Buyer</strong>: <span class="offer-buyer">0xJNDSGANK5672</span><br/>
-            <strong>Bid</strong>: <span class="offer-bid">4</span><br/>
-            <button id="sell-button" class="btn btn-default btn-sell" type="button" data-id="0">Sell</button>  
-          </div>
+            <div class="panel-body">
+              <strong>Buyer</strong>: <span class="offer-buyer">0xJNDSGANK5672</span><br/>
+              <strong>Bid</strong>: <span class="offer-bid">4</span><br/>
+              <button id="sell-button" class="btn btn-default btn-sell" type="button" data-id="0">Sell</button>  
+            </div>
         </div>
       </div>
     </div>

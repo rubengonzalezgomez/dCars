@@ -105,6 +105,8 @@ contract CarData is Ownable{
         uint i = 0;
         while(!found && i<offers[id].length){
             if(offers[id][i].buyer == msg.sender){
+                uint256 amountToReturn = offers[id][i].bid * 1000000000000000000;
+                transferEther(amountToReturn, payable(msg.sender));
                 offers[id][i].bid = _bid;
                 found = true;
             } 
