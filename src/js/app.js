@@ -1,11 +1,9 @@
-//import {pinJSONToIPFS} from './pinata.js';
-//const pinata = require('./pinata');
+const pinata = require('./pinata.js');
 
 App = {
   web3Provider: null,
   contracts: {},
   contractAddress : null,
-  pinata: null,
 
   init: async function() {
     return await App.initWeb3();
@@ -49,27 +47,6 @@ App = {
   showCars: async function(){
     // Load cars. 
     let carInstance = await App.contracts.CarOwnership.deployed();
-
-    web3.eth.getBalance(contractAddress,function(error,result){
-
-      if(error){
-         console.log(error)
-      }
-      else{
-         console.log(result)
-      }
-   });
-    
-    web3.eth.getBalance(web3.eth.accounts[0],function(error,result){
-
-      if(error){
-         console.log(error)
-      }
-      else{
-         console.log(result)
-      }
-   });
-
 
     const numCars = await carInstance.getNumCars();
 
@@ -266,12 +243,12 @@ App = {
 
     let carInstance = await App.contracts.CarOwnership.deployed();
     carInstance.createListNewCar(vin,brand,model,kms, image, price,{"from" : web3.eth.accounts[0]});
+    await App.createMetadata(vin,brand,model,kms,image);
     },
 
 
-  /*createMetadata: async function(vin,brand, model, kms, image){
-
-      console.log("IN");
+  createMetadata: async function(vin,brand, model, kms, image){
+    
       const metadata = new Object();
       metadata.vin = vin;
       metadata.brand = brand;
@@ -279,7 +256,7 @@ App = {
       metadata.kms = kms
       metadata.image = image;
   
-      const pinataResponse = await ('pinata.json').pinJSONToIPFS(metadata);
+      const pinataResponse = await pinata(metadata);
       if (!pinataResponse.success) {
         return {
             success: false,
@@ -289,7 +266,7 @@ App = {
     const tokenURI = pinataResponse.pinataUrl;
     console.log(tokenURI);
     return tokenURI;  
-    }*/
+    }
 
 };
 

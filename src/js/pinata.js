@@ -1,14 +1,14 @@
-require('dotenv').config();
-
+const dotenv = require('envify');
 const key = process.env.REACT_APP_PINATA_KEY;
 const secret = process.env.REACT_APP_PINATA_SECRET;
 
-require('axios').post();
+const axios = require('axios');
 
- const pinJSONToIPFS = async(JSONBody) => {
+const pinJSONToIPFS = async(JSONBody) => {
     const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
     //making axios POST request to Pinata ⬇️
-    return post(url, JSONBody, {
+    return axios 
+        .post(url, JSONBody, {
             headers: {
                 pinata_api_key: key,
                 pinata_secret_api_key: secret,
@@ -30,4 +30,4 @@ require('axios').post();
     });
 };
 
-export default pinJSONToIPFS;
+module.exports = pinJSONToIPFS;
