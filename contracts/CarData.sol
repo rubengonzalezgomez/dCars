@@ -20,8 +20,6 @@ contract CarData is Ownable{
         address buyer;
         uint bid;
     }
-
-    bool publicOffers = false; //flag allows people see the offers of a car    //it is initialized to false (offers are private)
     
      // State of the sale
     enum State{ 
@@ -35,7 +33,7 @@ contract CarData is Ownable{
     string brand;
     string model;
     uint24 kilometraje;
-    string ipfsMetaData;
+    string image;
     uint price;
     State state;
     }
@@ -49,11 +47,10 @@ contract CarData is Ownable{
     event onSale(uint id, uint price);
     event Bid(uint id, uint bid);
     event Sold(uint id);
-    event OffersArePublic(uint id, bool state);
 
     //created but not onSale
-    function createNewCar(string memory _VIN, string memory _brand, string memory _model, uint24 _kilometraje, string memory _ipfsMetaData) external{
-        cars.push(Car(_VIN,_brand,_model,_kilometraje,_ipfsMetaData,0,State.NotListed));
+    function createNewCar(string memory _VIN, string memory _brand, string memory _model, uint24 _kilometraje, string memory _image) external returns(uint){
+        cars.push(Car(_VIN,_brand,_model,_kilometraje,_image,0,State.NotListed));
 
         uint id = cars.length-1;
         carToOwner[id] = msg.sender;
@@ -63,8 +60,8 @@ contract CarData is Ownable{
     }
 
     //created and onSale
-    function createListNewCar(string memory _VIN, string memory _brand, string memory _model, uint24 _kilometraje, string memory _ipfsMetaData,uint _price) external{
-        cars.push(Car(_VIN,_brand,_model,_kilometraje,_ipfsMetaData,_price,State.onSale));
+    function createListNewCar(string memory _VIN, string memory _brand, string memory _model, uint24 _kilometraje, string memory _image,uint _price) external{
+        cars.push(Car(_VIN,_brand,_model,_kilometraje,_image,_price,State.onSale));
 
         uint id = cars.length-1;
         carToOwner[id] = msg.sender;
@@ -121,14 +118,7 @@ contract CarData is Ownable{
     function howManyOffers(uint id) external view returns(uint){
         return offers[id].length;
     }
-
-    function setPublicOffers(uint id, bool _publicOffer) external{
-        require(msg.sender == carToOwner[id]);
-        publicOffers = _publicOffer;
-        emit OffersArePublic(id, _publicOffer);
-    } 
-
-    //if the publicOffers flag is active, everybody can see the offers
+    
     function getOffers(uint id) internal view returns(offer[] memory){
         //require(publicOffers);
         return offers[id];
@@ -140,13 +130,7 @@ contract CarData is Ownable{
 
     function getBid(uint id,uint i) public view returns (uint) {
         return offers[id][i].bid;
-    }  
-
-    //this function will be executed by the car automatically every month
-    function updateKilometraje(uint id, uint24 km) private{ 
-        require(km > cars[id].kilometraje);
-        cars[id].kilometraje = km;
-    }
+    }   
     
     function transferEther(uint256 _amount, address payable _to) public payable {
        _to.transfer(_amount);
@@ -182,6 +166,10 @@ contract CarData is Ownable{
     function getPrice(uint id) public view returns (uint) {
         return(cars[id].price);
     } 
+
+    function getImage(uint id) public view returns (string memory) {
+        return(cars[id].image);
+    }
 
     receive() external payable{}
     fallback() external payable{} 

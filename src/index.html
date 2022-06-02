@@ -41,7 +41,7 @@
       <p>
         Simply add your car info and press "Put up for sale"
       </p>
-      <form  onsubmit="App.handleNewCar()">
+      <form action="#" onsubmit="App.handleNewCar()">
         <h2>VIN</h2>
         <input
           id = "VIN"
@@ -74,15 +74,14 @@
         <input
           id = "price"
           type="number"
-          placeholder="Put 0 to not sell"
+          placeholder="0 to not sell"
           required="required"
         />
         <h2>Image</h2>
         <input
           id = "image"
-          type="file"
-          placeholder="Car´s image"
-          accept = ".jpeg,.jpg,.png"
+          type="string"
+          placeholder="Car´s image URL"
         />
 
         <br></br>
@@ -114,7 +113,7 @@
             <h3 class="panel-title">Brand-Model</h3>
           </div>
           <div class="panel-body">
-            <img alt="140x140" data-src="holder.js/140x140" class="img-rounded img-center" style="width: 100%;" src="https://picsum.photos/140/140" data-holder-rendered="true">
+            <img alt="140x140" data-src="holder.js/140x140" class="img" style="width: 100%;" src="https://picsum.photos/140/140" data-holder-rendered="true">
             <br/><br/>
             <strong>Owner</strong>: <span class="car-owner">0xJNDSGANK5672</span><br/>
             <strong>Brand</strong>: <span class="car-brand">AUDI</span><br/>
@@ -141,7 +140,7 @@
             <h3 class="panel-title">Brand-Model</h3>
           </div>
           <div class="panel-body">
-            <img alt="140x140" data-src="holder.js/140x140" class="img-rounded img-center" style="width: 100%;" src="https://picsum.photos/140/140" data-holder-rendered="true">
+            <img alt="140x140" data-src="holder.js/140x140" class="img" style="width: 100%;" src="https://picsum.photos/140/140" data-holder-rendered="true">
             <br/><br/>
             <strong>Owner</strong>: <span class="car-owner">0xJNDSGANK5672</span><br/>
             <strong>Brand</strong>: <span class="car-brand">AUDI</span><br/>

@@ -7,7 +7,7 @@ const axios = require('axios');
 const pinJSONToIPFS = async(JSONBody) => {
     const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
     //making axios POST request to Pinata ⬇️
-    return axios 
+    axios 
         .post(url, JSONBody, {
             headers: {
                 pinata_api_key: key,
@@ -28,6 +28,7 @@ const pinJSONToIPFS = async(JSONBody) => {
             }
 
     });
+    return axios;
 };
 
 module.exports = pinJSONToIPFS;

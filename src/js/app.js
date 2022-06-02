@@ -45,10 +45,17 @@ App = {
   },
 
   showCars: async function(){
+
     // Load cars. 
     let carInstance = await App.contracts.CarOwnership.deployed();
 
     const numCars = await carInstance.getNumCars();
+
+    //Load images
+    let images = [];
+    for(i = 0;i < numCars; i++){
+      images.push(await carInstance.getImage(i));
+    }
 
     //Load brands
     let brands = [];
@@ -79,7 +86,7 @@ App = {
       const newCar = carTemplate.clone();
       newCar.css({display: "inline"});
       newCar.find('.panel-title').text(brands[i] + ' ' + models[i]);
-      newCar.find('img').attr('src', `https://gateway.pinata.cloud/ipfs/`+'QmZqffgHmmvoznQ32MMfymD1ivNNcazKxNjrMLZ35KuC5e'); //cars[i].image);
+      newCar.find('img').attr('src', images[i]);  
       const id = i;
       
       newCar.find('.car-owner').text(owner.substr(0,5) + "..." + owner.substr(-5,5));
@@ -139,7 +146,10 @@ App = {
       const newCar = carTemplate.clone();
       newCar.css({display: "inline"});
       newCar.find('.panel-title').text(brands[i] + ' ' + models[i]);
-      newCar.find('img').attr('src', `https://gateway.pinata.cloud/ipfs/`+'QmZqffgHmmvoznQ32MMfymD1ivNNcazKxNjrMLZ35KuC5e'); //cars[i].image);
+      newCar.find('img')
+        .attr('src', images[i])
+        .attr('width',"140")
+        .attr('height',"180");
       const id = i;
   
       newCar.find('.car-owner').text(owner.substr(0,5) + "..." + owner.substr(-5,5));
@@ -242,30 +252,34 @@ App = {
     var price = document.getElementById("price").value;
 
     let carInstance = await App.contracts.CarOwnership.deployed();
-    carInstance.createListNewCar(vin,brand,model,kms, image, price,{"from" : web3.eth.accounts[0]});
-    await App.createMetadata(vin,brand,model,kms,image);
+    await carInstance.createListNewCar(vin,brand,model,kms, image,price,{"from" : web3.eth.accounts[0]}).toString();
+    
+    await App.createMetadata(vin,brand,model,kms, image);
+
+    setTimeout(()=>{window.location.reload()}, 8000);
+    
     },
 
 
-  createMetadata: async function(vin,brand, model, kms, image){
-    
+    createMetadata: async function(vin,brand, model, kms, image){
+      
       const metadata = new Object();
       metadata.vin = vin;
       metadata.brand = brand;
       metadata.model = model;
       metadata.kms = kms
       metadata.image = image;
-  
+      
       const pinataResponse = await pinata(metadata);
       if (!pinataResponse.success) {
         return {
             success: false,
-            status: "😢 Something went wrong while uploading your tokenURI.",
+            status: "Something went wrong while uploading your tokenURI.",
         }
-    } 
-    const tokenURI = pinataResponse.pinataUrl;
-    console.log(tokenURI);
-    return tokenURI;  
+      } 
+      const tokenURI = pinataResponse.pinataUrl;
+      console.log(tokenURI);
+      return tokenURI;  
     }
 
 };
