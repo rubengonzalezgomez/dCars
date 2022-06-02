@@ -53,32 +53,30 @@ App = {
 
     //Load images
     let images = [];
-    for(i = 0;i < numCars; i++){
-      images.push(await carInstance.getImage(i));
-    }
 
     //Load brands
     let brands = [];
-    for(i = 0;i < numCars; i++){
-      brands.push(await carInstance.getBrand(i));
-    }
 
     //Load models
     let models = [];
-    for(i = 0;i < numCars; i++){
-      models.push(await carInstance.getModel(i));
-    }
 
     //Load prices
     let prices = [];
-    for(i = 0;i < numCars; i++){
-      prices.push(await carInstance.getPrice(i));
-    }
 
+    //Load kilometraje
     let kms = [];
+
     for(i = 0;i < numCars; i++){
+      images.push(await carInstance.getImage(i));
+      brands.push(await carInstance.getBrand(i));
+      models.push(await carInstance.getModel(i));
+      prices.push(await carInstance.getPrice(i));
       kms.push(await carInstance.getKMS(i));
     }
+
+
+    console.log(images);
+    console.log(brands);
 
     //Print my cars
     var MyCarsRow = $('#MyCarsRow');
@@ -92,9 +90,7 @@ App = {
       newCar.css({display: "inline"});
       newCar.find('.panel-title').text(brands[i] + ' ' + models[i]);
       newCar.find('img')
-        .attr('src', images[i])
-        .attr('width',"140")
-        .attr('height',"180");  
+        .attr('src', images[i])  
       const id = i;
       
       newCar.find('.car-owner').text(owner.substr(0,5) + "..." + owner.substr(-5,5));
