@@ -74,10 +74,6 @@ App = {
       kms.push(await carInstance.getKMS(i));
     }
 
-
-    console.log(images);
-    console.log(brands);
-
     //Print my cars
     var MyCarsRow = $('#MyCarsRow');
     var carTemplate = $('#carTemplate');
