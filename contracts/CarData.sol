@@ -49,7 +49,7 @@ contract CarData is Ownable{
     event Sold(uint id);
 
     //created but not onSale
-    function createNewCar(string memory _VIN, string memory _brand, string memory _model, uint24 _kilometraje, string memory _image) external returns(uint){
+    function createNewCar(string memory _VIN, string memory _brand, string memory _model, uint24 _kilometraje, string memory _image) external{
         cars.push(Car(_VIN,_brand,_model,_kilometraje,_image,0,State.NotListed));
 
         uint id = cars.length-1;
@@ -169,6 +169,10 @@ contract CarData is Ownable{
 
     function getImage(uint id) public view returns (string memory) {
         return(cars[id].image);
+    }
+
+    function getKMS(uint id) public view returns (uint) {
+        return(cars[id].kilometraje);
     }
 
     receive() external payable{}

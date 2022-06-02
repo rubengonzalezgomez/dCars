@@ -75,6 +75,11 @@ App = {
       prices.push(await carInstance.getPrice(i));
     }
 
+    let kms = [];
+    for(i = 0;i < numCars; i++){
+      kms.push(await carInstance.getKMS(i));
+    }
+
     //Print my cars
     var MyCarsRow = $('#MyCarsRow');
     var carTemplate = $('#carTemplate');
@@ -86,12 +91,16 @@ App = {
       const newCar = carTemplate.clone();
       newCar.css({display: "inline"});
       newCar.find('.panel-title').text(brands[i] + ' ' + models[i]);
-      newCar.find('img').attr('src', images[i]);  
+      newCar.find('img')
+        .attr('src', images[i])
+        .attr('width',"140")
+        .attr('height',"180");  
       const id = i;
       
       newCar.find('.car-owner').text(owner.substr(0,5) + "..." + owner.substr(-5,5));
       newCar.find('.car-brand').text(brands[i]);
       newCar.find('.car-model').text(models[i]);
+      newCar.find('.car-kms').text(kms[i]);
 
       const price = prices[i];
       if(price == 0 ){ newCar.find('.car-price').text('Not On Sale');}
