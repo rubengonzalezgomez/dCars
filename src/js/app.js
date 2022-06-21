@@ -106,7 +106,7 @@ App = {
         newCar.find('#modify-amount').attr('style', "Display: none");
         newCar.find('#list-button').on('click', async () => {
           var list = document.getElementsByClassName("price")[id].value;
-          carInstance.List(id,list,{"from" : web3.eth.accounts[0]});
+          carInstance.setPrice(id,list,{"from" : web3.eth.accounts[0]});
       });
       }
       
@@ -119,7 +119,7 @@ App = {
         .prop('placeholder', "Min price: " + prices[i] / 2);
         newCar.find('#modify-button').on('click', async () => {
           var price = document.getElementsByClassName("modify")[id].value;
-          carInstance.modifyPrice(id,price,{"from" : web3.eth.accounts[0]});
+          carInstance.setPrice(id,price,{"from" : web3.eth.accounts[0]});
       });
       newCar.find('#bid-button').on('click', async () => {
           var bid = document.getElementsByClassName("amount")[id].value;
@@ -178,7 +178,7 @@ App = {
         .prop('placeholder', "Min price: " + prices[i] / 2);
         newCar.find('#modify-button').on('click', async () => {
           var price = document.getElementsByClassName("modify")[id].value;
-          carInstance.modifyPrice(id,price,{"from" : web3.eth.accounts[0]});
+          carInstance.setPrice(id,price,{"from" : web3.eth.accounts[0]});
       });
       newCar.find('#bid-button').on('click', async () => {
           var bid = document.getElementsByClassName("amount")[id].value;

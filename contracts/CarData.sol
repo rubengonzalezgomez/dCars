@@ -15,18 +15,12 @@ contract CarData is Ownable{
     mapping (address => uint[]) ownerToCars;    //one person can have more than one car
 
     mapping(uint => offer[]) offers;        //it represents the offers a car receives
-
-    struct offer{
-        address buyer;
-        uint bid;
-    }
     
      // State of the sale
     enum State{ 
         NotListed,    
         onSale
     }
-
 
     struct Car{
     string VIN; //frame number works like a identifier
@@ -39,6 +33,11 @@ contract CarData is Ownable{
     }
 
     Car[] cars;
+
+     struct offer{
+        address buyer;
+        uint bid;
+    }
 
     modifier Sale(uint id) 	{ require(cars[id].state == State.onSale); 	_;}
     modifier NotListed(uint id) 	{ require(cars[id].state == State.NotListed); 	_;}
@@ -70,19 +69,11 @@ contract CarData is Ownable{
         emit Created(id, _brand, _model);
         emit onSale(id, _price);
     }
-    
 
-      function List(uint id, uint _price) external {
+    function setPrice(uint id, uint _price) external{
         require(msg.sender == carToOwner[id]);  //only the car owner can list his car
         cars[id].price = _price;
         cars[id].state = State.onSale;
-        emit onSale(id,_price);
-    }
-
-    function modifyPrice(uint id, uint _price) external Sale(id){
-        require(msg.sender == carToOwner[id]);  //only the car owner can list his car
-        cars[id].price = _price;
-
         emit onSale(id,_price);
     }
 
@@ -92,6 +83,7 @@ contract CarData is Ownable{
         delete offers[id];
         cars[id].state = State.NotListed;
     }
+
 
     function placeBid(uint id,uint _bid)external payable Sale(id){
         require(msg.sender != carToOwner[id]);
