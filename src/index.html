@@ -30,18 +30,22 @@
       <div class="row">
         <div class="col-xs-12 col-sm-8 col-sm-push-2">
           
-          <h1 class="text-center">DCars</h1>
+          <h1 class="text-center"><img
+            src="Logo.png"
+            style="width:200px;height:200px;">
+          </img>
+          </h1>
           <hr/>
           <br/>
         </div>
       </div>
 
       <br></br>
-      <h1 id="title">Add new car</h1>
+      <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo">Add new car</button>
       <p>
         Simply add your car info and press "Put up for sale"
       </p>
-      <form action="#" onsubmit="App.handleNewCar()">
+      <form id= "demo" class = "collapse" action="#" onsubmit="App.handleNewCar()">
         <h2>VIN</h2>
         <input
           id = "VIN"
@@ -70,12 +74,11 @@
           placeholder="e.g. 120000"
           required="required"
         />
-        <h2>Price(ETH)</h2>
+        <h2>Price</h2>
         <input
           id = "price"
           type="number"
-          placeholder="0 to not sell"
-          required="required"
+          placeholder="ETH"
         />
         <h2>Image</h2>
         <input
@@ -100,12 +103,11 @@
 
       <div id="carsRow" class="row">
         <!-- CARS LOAD HERE -->
-        <h2>Cars On Sale</h2>
+        <h2>Market</h2>
       </div>
       
       
     </div>
-
     <div id="carTemplate" style="display: none;">
       <div class="col-sm-3 col-md-3 col-lg-7">
         <div class="panel panel-default panel-car">
@@ -123,8 +125,7 @@
             <input style="width: 40px"  id = "modify-amount" type="number" class= "modify" required="required"/>
             <button id="modify-button" class="btn btn-default btn-mod" type="button" data-id="0">Modify price</button>  <br/><br/>
 
-            <input id = "bid-amount" type="number" class= "amount" required="required"/>
-            <button id="bid-button" class="btn btn-default btn-bid" type="button" data-id="0">Place a bid</button>  
+            <button id="unlist-button" class="btn btn-default btn-unlist" type="button" data-id="0">Unlist</button>  
 
             <input id = "car-amount" type="number" class= "price" required="required"/>
             <button id="list-button" class="btn btn-default btn-list" type="button" data-id="0">Put Up For Sale</button> 

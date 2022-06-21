@@ -79,7 +79,7 @@ App = {
     var carTemplate = $('#carTemplate');
 
     for(let i=0;i<numCars;i++) {
-      let owner = await carInstance.getOwner(i);
+      let owner = await carInstance.ownerOf(i);
       if(owner == web3.eth.accounts[0]){
       
       const newCar = carTemplate.clone();
@@ -98,8 +98,6 @@ App = {
       if(price == 0 ){ newCar.find('.car-price').text('Not On Sale');}
       else{newCar.find('.car-price').text(price);}
 
-      newCar.find('.btn-bid').attr('style', "Display: none");
-      newCar.find('#bid-amount').attr('style', "Display: none");
 
       if(price == 0 ){
         newCar.find('.btn-mod').attr('style', "Display: none");
@@ -108,9 +106,13 @@ App = {
           var list = document.getElementsByClassName("price")[id].value;
           carInstance.setPrice(id,list,{"from" : web3.eth.accounts[0]});
       });
+      newCar.find('#unlist-button').on('click', async () => {
+        carInstance.unlist(id,{"from" : web3.eth.accounts[0]});
+    });
       }
       
       else{
+      newCar.find('.btn-unlist').attr('style', "Display: none");
       newCar.find('.btn-list').attr('style', "Display: none");
       newCar.find('#car-amount').attr('style', "Display: none");
       newCar.find('.btn-bid').attr('data-id', i);
@@ -141,7 +143,7 @@ App = {
     var carTemplate = $('#carOnSaleTemplate');
 
     for(let i=0;i<numCars;i++) {
-      const owner = await carInstance.getOwner(i);
+      const owner = await carInstance.ownerOf(i);
       if(owner != web3.eth.accounts[0]){
 
       const newCar = carTemplate.clone();
@@ -251,6 +253,8 @@ App = {
     var kms = document.getElementById("kms").value;
     var image = document.getElementById("image").value;
     var price = document.getElementById("price").value;
+
+    console.log(price);
 
     let carInstance = await App.contracts.CarOwnership.deployed();
     await carInstance.createListNewCar(vin,brand,model,kms, image,price,{"from" : web3.eth.accounts[0]}).toString();
