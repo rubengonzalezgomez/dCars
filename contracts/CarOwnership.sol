@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 /** @title Car Ownership
   * This contract is the one that is deployed for this dApp.
   * It inherits CarData in order to deploye all the logic,
-  * and it adds ERC721 nature to the ticket tokens. In order
+  * and it adds ERC721 nature to the car tokens. In order
   * for that to happen, ERC165 is also necessary.
   * 
   * The documentation for all the implemented methods in this
@@ -27,15 +27,13 @@ contract CarOwnership is CarData, IERC721{
     mapping (uint256 => address) tokenApprovals;
     mapping (address => mapping (address => bool)) internal operatorApprovals;
 
-    function supportsInterface(bytes4 interfaceID) override external view returns (bool){
-		return supportedInterfaces[interfaceID];
-	}   
-
     //event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
     //event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
     //event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
 
-
+    function supportsInterface(bytes4 interfaceID) override external view returns (bool){
+		return supportedInterfaces[interfaceID];
+	  }   
 
     function balanceOf(address owner) override external view returns (uint256 balance){
       require(owner != address(0));
@@ -50,6 +48,10 @@ contract CarOwnership is CarData, IERC721{
 
     function safeTransferFrom(address from,address to,uint256 tokenId) override external payable{
         safeTransferFrom(from, to, tokenId,"");
+    }
+
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public payable{
+      transferFrom(from, to, tokenId);
     }
 
     function transferFrom(address from,address to,uint256 tokenId) override public payable{
@@ -84,7 +86,6 @@ contract CarOwnership is CarData, IERC721{
       emit Sold(tokenId);
     }
 
-
     function approve(address to, uint256 tokenId) external{
 
       address token_owner = ownerOf(tokenId);
@@ -109,17 +110,6 @@ contract CarOwnership is CarData, IERC721{
       return operatorApprovals[owner][operator];
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public payable{
-      transferFrom(from, to, tokenId);
-    }
-
-    /**
-	 * @dev Returns whether the given spender can transfer a given token ID
-	 * @param _spender address of the spender to query
-	 * @param _tokenId uint256 ID of the token to be transferred
-	 * @return bool whether the msg.sender is approved for the given token ID,
-	 *  is an operator of the owner, or is the owner of the token
-    */
   	function isApprovedOrOwner(address _spender, uint256 _tokenId) internal view returns (bool) {
 	    address token_owner = ownerOf(_tokenId);
 	    return (

@@ -70,6 +70,7 @@ contract CarData is Ownable{
         emit onSale(id, _price);
     }
 
+    //modify the price of your NFT
     function setPrice(uint id, uint _price) external{
         require(msg.sender == carToOwner[id]);  //only the car owner can list his car
         cars[id].price = _price;
@@ -77,6 +78,7 @@ contract CarData is Ownable{
         emit onSale(id,_price);
     }
 
+    //take your NFT off the market
     function unlist(uint id) external Sale(id){
         require(msg.sender == carToOwner[id]);
         cars[id].price = 0;
@@ -84,7 +86,7 @@ contract CarData is Ownable{
         cars[id].state = State.NotListed;
     }
 
-
+    //a user place an offer
     function placeBid(uint id,uint _bid)external payable Sale(id){
         require(msg.sender != carToOwner[id]);
         uint minimum = cars[id].price/2;
@@ -106,46 +108,26 @@ contract CarData is Ownable{
          emit Bid(id,_bid);
     }
 
-    //everybody can know how many offers a car has received
+    //get the num of offers a car has received
     function howManyOffers(uint id) external view returns(uint){
         return offers[id].length;
     }
-    
-    function getOffers(uint id) internal view returns(offer[] memory){
-        //require(publicOffers);
-        return offers[id];
-    }
 
+    //returns who has made the offer
     function getBuyer(uint id,uint i) public view returns (address) {
         return offers[id][i].buyer;
     }  
 
+    //returns the amount of the offer
     function getBid(uint id,uint i) public view returns (uint) {
         return offers[id][i].bid;
     }   
-    
-    function transferEther(uint256 _amount, address payable _to) public payable {
-       _to.transfer(_amount);
-    }
 
-    function returnEther(uint id) internal {
-      for(uint i = 0; i<offers[id].length; i++){
-          if(offers[id][i].buyer != carToOwner[id]){
-              uint256 amount = offers[id][i].bid * 1000000000000000000;
-              address payable to = payable(offers[id][i].buyer);
-              transferEther(amount,to);
-          }
-      }
-    }
-
-    function getOwner(uint id) public view returns (address) {
-        return(carToOwner[id]);
-    }  
+    //returns the car info
 
     function getNumCars() public view returns(uint){
         return cars.length;
     }
-
 
     function getBrand(uint id) public view returns (string memory) {
         return(cars[id].brand);
@@ -165,6 +147,20 @@ contract CarData is Ownable{
 
     function getKMS(uint id) public view returns (uint) {
         return(cars[id].kilometraje);
+    }
+
+    function transferEther(uint256 _amount, address payable _to) public payable {
+       _to.transfer(_amount);
+    }
+
+    function returnEther(uint id) internal {
+      for(uint i = 0; i<offers[id].length; i++){
+          if(offers[id][i].buyer != carToOwner[id]){
+              uint256 amount = offers[id][i].bid * 1000000000000000000;
+              address payable to = payable(offers[id][i].buyer);
+              transferEther(amount,to);
+          }
+      }
     }
 
     receive() external payable{}
