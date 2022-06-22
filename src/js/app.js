@@ -95,30 +95,24 @@ App = {
       newCar.find('.car-kms').text(kms[i]);
 
       const price = prices[i];
-      if(price == 0 ){ newCar.find('.car-price').text('Not On Sale');}
-      else{newCar.find('.car-price').text(price);}
-
-
       if(price == 0 ){
+        newCar.find('.car-price').text('Not On Sale');
         newCar.find('.btn-mod').attr('style', "Display: none");
         newCar.find('#modify-amount').attr('style', "Display: none");
+        newCar.find('.btn-unlist').attr('style', "Display: none");
         newCar.find('#list-button').on('click', async () => {
           var list = document.getElementsByClassName("price")[id].value;
           carInstance.setPrice(id,list,{"from" : web3.eth.accounts[0]});
-      });
-      newCar.find('#unlist-button').on('click', async () => {
-        carInstance.unlist(id,{"from" : web3.eth.accounts[0]});
-    });
-      }
-      
+        });
+        }
       else{
-      newCar.find('.btn-unlist').attr('style', "Display: none");
-      newCar.find('.btn-list').attr('style', "Display: none");
-      newCar.find('#car-amount').attr('style', "Display: none");
-      newCar.find('.btn-bid').attr('data-id', i);
-      newCar.find('#bid-amount')
-        .prop('min', prices[i] / 2)
-        .prop('placeholder', "Min price: " + prices[i] / 2);
+        newCar.find('.car-price').text(price);
+        newCar.find('.btn-list').attr('style', "Display: none");
+        newCar.find('#car-amount').attr('style', "Display: none");
+        newCar.find('.btn-bid').attr('data-id', i);
+        newCar.find('#bid-amount')
+          .prop('min', prices[i] / 2)
+          .prop('placeholder', "Min price: " + prices[i] / 2);
         newCar.find('#modify-button').on('click', async () => {
           var price = document.getElementsByClassName("modify")[id].value;
           carInstance.setPrice(id,price,{"from" : web3.eth.accounts[0]});
@@ -127,7 +121,10 @@ App = {
           var bid = document.getElementsByClassName("amount")[id].value;
           carInstance.placeBid(id,bid,{"from" : web3.eth.accounts[0]});
       });
-    }
+      newCar.find('#unlist-button').on('click', async () => {
+        carInstance.unlist(id,{"from" : web3.eth.accounts[0]});
+    });
+      }
 
       MyCarsRow.append(newCar);
 
@@ -158,6 +155,7 @@ App = {
       newCar.find('.car-owner').text(owner.substr(0,5) + "..." + owner.substr(-5,5));
       newCar.find('.car-brand').text(brands[i]);
       newCar.find('.car-model').text(models[i]);
+      newCar.find('.car-kms').text(kms[i]);
 
       const price = prices[i];
       if(price == 0 ){ newCar.find('.car-price').text('Not On Sale');}
@@ -232,7 +230,7 @@ App = {
 
       newOffer.css({display: "inline"});
       newOffer.find('.panel-title').text('Offer ' + (j+1));
-      newOffer.find('.offer-buyer').text(buyers[j].substr(0,5) + "..." + buyers[j].substr(-5,5));
+      newOffer.find('.offer-buyer').text(buyers[j].substr(0,4) + "..." + buyers[j].substr(-4,5));
       newOffer.find('.offer-bid').text(bids[j]);
       newOffer.find('#sell-button').on('click', () => {
         carInstance.transferFrom(web3.eth.accounts[0],buyers[buyerid],id,{"from" : web3.eth.accounts[0]});
