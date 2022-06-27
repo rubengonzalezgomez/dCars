@@ -109,17 +109,9 @@ App = {
         newCar.find('.car-price').text(price);
         newCar.find('.btn-list').attr('style', "Display: none");
         newCar.find('#car-amount').attr('style', "Display: none");
-        newCar.find('.btn-bid').attr('data-id', i);
-        newCar.find('#bid-amount')
-          .prop('min', prices[i] / 2)
-          .prop('placeholder', "Min price: " + prices[i] / 2);
         newCar.find('#modify-button').on('click', async () => {
           var price = document.getElementsByClassName("modify")[id].value;
           carInstance.setPrice(id,price,{"from" : web3.eth.accounts[0]});
-      });
-      newCar.find('#bid-button').on('click', async () => {
-          var bid = document.getElementsByClassName("amount")[id].value;
-          carInstance.placeBid(id,bid,{"from" : web3.eth.accounts[0]});
       });
       newCar.find('#unlist-button').on('click', async () => {
         carInstance.unlist(id,{"from" : web3.eth.accounts[0]});
@@ -141,66 +133,49 @@ App = {
 
     for(let i=0;i<numCars;i++) {
       const owner = await carInstance.ownerOf(i);
-      if(owner != web3.eth.accounts[0]){
+      if(owner != web3.eth.accounts[0] && prices[i] != 0){
 
-      const newCar = carTemplate.clone();
-      newCar.css({display: "inline"});
-      newCar.find('.panel-title').text(brands[i] + ' ' + models[i]);
-      newCar.find('img')
-        .attr('src', images[i])
-        .attr('width',"140")
-        .attr('height',"180");
-      const id = i;
-  
-      newCar.find('.car-owner').text(owner.substr(0,5) + "..." + owner.substr(-5,5));
-      newCar.find('.car-brand').text(brands[i]);
-      newCar.find('.car-model').text(models[i]);
-      newCar.find('.car-kms').text(kms[i]);
+        const newCar = carTemplate.clone();
+        newCar.css({display: "inline"});
+        newCar.find('.panel-title').text(brands[i] + ' ' + models[i]);
+        newCar.find('img')
+          .attr('src', images[i])
+          .attr('width',"140")
+          .attr('height',"180");
+        const id = i;
+        
+        newCar.find('.car-owner').text(owner.substr(0,5) + "..." + owner.substr(-5,5));
+        newCar.find('.car-brand').text(brands[i]);
+        newCar.find('.car-model').text(models[i]);
+        newCar.find('.car-kms').text(kms[i]);
 
-      const price = prices[i];
-      if(price == 0 ){ newCar.find('.car-price').text('Not On Sale');}
-      else{newCar.find('.car-price').text(price);}
-      
-      newCar.find('.btn-mod').attr('style', "Display: none");
-      newCar.find('#modify-amount').attr('style', "Display: none");
-      newCar.find('.btn-list').attr('style', "Display: none");
-      newCar.find('#car-amount').attr('style', "Display: none");
+        const price = prices[i];
 
-      if(price == 0 ){
-        newCar.find('.btn-bid').attr('style', "Display: none");
-        newCar.find('#bid-amount').attr('style', "Display: none");
-      }
-      
-      else{
-      newCar.find('.btn-bid').attr('data-id', i);
-      newCar.find('#bid-amount')
-        .prop('min', prices[i] / 2)
-        .prop('placeholder', "Min price: " + prices[i] / 2);
-        newCar.find('#modify-button').on('click', async () => {
-          var price = document.getElementsByClassName("modify")[id].value;
-          carInstance.setPrice(id,price,{"from" : web3.eth.accounts[0]});
-      });
-      newCar.find('#bid-button').on('click', async () => {
+        newCar.find('.car-price').text(price);
+        newCar.find('.btn-bid').attr('data-id', i);
+        newCar.find('#bid-amount')
+          .prop('min', prices[i] / 2)
+          .prop('placeholder', "Min price: " + prices[i] / 2);
+
+        newCar.find('#bid-button').on('click', async () => {
           var bid = document.getElementsByClassName("amount")[id].value;
-          //carInstance.placeBid(id,bid,{"from" : web3.eth.accounts[0]});
           const value = web3.toWei(bid).toString(); 
           web3.eth.sendTransaction( 
             {from:web3.eth.accounts[0],
-            to:contractAddress,
-            value: value, 
-                }, function(err, transactionHash) {
-          if (!err){
-            console.log(transactionHash + " success"); 
-            carInstance.placeBid(id,bid,{"from" : web3.eth.accounts[0]});
-          }
+              to:contractAddress,
+              value: value, 
+            }, function(err, transactionHash) {
+                if (!err){
+                  carInstance.placeBid(id,bid,{"from" : web3.eth.accounts[0]});
+                }
+            });
         });
-      });
-    }
 
-      carsRow.append(newCar);
+        carsRow.append(newCar);
+        
+      }
 
      }
-    }
     
   },
 
@@ -242,8 +217,6 @@ App = {
      }
   },
 
-
-
   handleNewCar: async function() {
     var vin = document.getElementById("VIN").value;
     var brand = document.getElementById("brand").value;
@@ -252,8 +225,6 @@ App = {
     var image = document.getElementById("image").value;
     var price = document.getElementById("price").value;
 
-    console.log(price);
-
     let carInstance = await App.contracts.CarOwnership.deployed();
     await carInstance.createListNewCar(vin,brand,model,kms, image,price,{"from" : web3.eth.accounts[0]}).toString();
     
@@ -261,10 +232,9 @@ App = {
 
     setTimeout(()=>{window.location.reload()}, 8000);
     
-    },
+  },
 
-
-    createMetadata: async function(vin,brand, model, kms, image){
+  createMetadata: async function(vin,brand, model, kms, image){
       
       const metadata = new Object();
       metadata.vin = vin;
@@ -283,7 +253,7 @@ App = {
       const tokenURI = pinataResponse.pinataUrl;
       console.log(tokenURI);
       return tokenURI;  
-    }
+  }
 
 };
 
